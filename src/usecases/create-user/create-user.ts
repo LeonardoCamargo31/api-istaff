@@ -1,5 +1,7 @@
-import { User } from 'src/entities/user'
-import { UserRepository } from 'src/repository/user-repository'
+import { User } from '../../entities/user'
+import { UserRepository } from '../../repository/user-repository'
+import { Either, left, right } from '../../shared/either'
+import { UserAlreadyExistsError } from './errors/user-already-exists-error'
 
 export class CreateUser {
   private readonly userRepository:UserRepository
@@ -8,8 +10,13 @@ export class CreateUser {
     this.userRepository = userRepository
   }
 
-  async perform (user: User):Promise<User> {
+  async perform (user: User):Promise<Either<UserAlreadyExistsError, User>> {
+    const exists = await this.userRepository.exists(user.email)
+    if (exists) {
+      return left(new UserAlreadyExistsError(user.email))
+    }
+
     await this.userRepository.add(user)
-    return user
+    return right(user)
   }
 }

@@ -1,5 +1,19 @@
 import { UserRepository } from './user-repository'
 import { MongoHelper } from '../infra/db/mongo-helper'
+import { User } from 'src/entities/user'
+
+const userData:User = {
+  name: 'any_name',
+  email: 'any@email.com',
+  address: {
+    street: 'any_street',
+    number: 123456,
+    neighborhood: 'any_neighborhood',
+    complement: 'any_complement',
+    city: 'any_city',
+    state: 'any_state'
+  }
+}
 
 describe('Create user', () => {
   beforeAll(async () => {
@@ -16,30 +30,24 @@ describe('Create user', () => {
 
   test('should create new user', async () => {
     const repository = new UserRepository()
-    const name = 'any_name'
-    const email = 'any@email.com'
-    await repository.add({ name, email })
-    const result = await repository.findByEmail(email)
+    await repository.add(userData)
+    const result = await repository.findByEmail(userData.email)
     expect(result.name).toBe('any_name')
     expect(result.email).toBe('any@email.com')
   })
 
   test('should find user by email', async () => {
     const repository = new UserRepository()
-    const name = 'any_name'
-    const email = 'any@email.com'
-    await repository.add({ name, email })
-    const result = await repository.findByEmail(email)
+    await repository.add(userData)
+    const result = await repository.findByEmail(userData.email)
     expect(result.name).toBe('any_name')
     expect(result.email).toBe('any@email.com')
   })
 
   test('should if user exists', async () => {
     const repository = new UserRepository()
-    const name = 'any_name'
-    const email = 'any@email.com'
-    await repository.add({ name, email })
-    const exists = await repository.exists(email)
+    await repository.add(userData)
+    const exists = await repository.exists(userData.email)
     expect(exists).toBeTruthy()
   })
 })
